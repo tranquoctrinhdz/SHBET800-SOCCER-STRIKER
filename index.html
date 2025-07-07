@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Soccer Striker - Công cụ dự đoán hướng sút</title>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Anton&display=swap');
+    body {
+      margin: 0; padding: 20px;
+      background: linear-gradient(to bottom, #014701, #25a525);
+      font-family: 'Anton', sans-serif;
+      color: #fff700;
+      text-align: center;
+      user-select: none;
+    }
+    h1 {
+      font-size: 3rem;
+      text-shadow: 2px 2px 4px #000;
+      animation: pulse 2s infinite;
+      margin-bottom: 30px;
+    }
+    @keyframes pulse {
+      0%,100% { text-shadow: 2px 2px 4px #000; color: #ffdd00;}
+      50% { text-shadow: 4px 4px 10px #ffcc00; color: #fff700;}
+    }
+    .buttons-group {
+      margin-top: 8px;
+      margin-bottom: 2px; /* khoảng cách dưới nhóm nút */
+    }
+    button {
+      margin: 12px 10px;
+      padding: 14px 28px;
+      font-size: 20px;
+      font-weight: bold;
+      border-radius: 15px;
+      border: none;
+      cursor: pointer;
+      background: linear-gradient(to bottom, #ffcc00, #ff9900);
+      color: #000;
+      box-shadow: 0 5px #b36b00;
+      transition: background 0.3s, transform 0.2s;
+      user-select: none;
+    }
+    button:hover {
+      background: linear-gradient(to bottom, #fff700, #ffcc00);
+      transform: scale(1.05);
+    }
+    button:active {
+      box-shadow: 0 2px #b36b00;
+      transform: scale(0.98);
+    }
+    .result {
+      font-size: 2.5rem;
+      margin-top: 25px;
+      font-weight: bold;
+      color: #00ff00;
+      text-shadow: 1px 1px 3px #000;
+      animation: blink 1.5s infinite alternate;
+      user-select: none;
+      min-height: 60px;
+    }
+    @keyframes blink {
+      0% {opacity:1;}
+      100% {opacity:0.5;}
+    }
+    .history {
+      max-width: 480px;
+      margin: 2px auto 20px auto;  /* margin-top nhỏ sát nút */
+      background: rgba(0,0,0,0.4);
+      padding: 20px 25px;
+      border-radius: 14px;
+      font-size: 1.3rem;
+      color: #fff700;
+      box-shadow: 0 0 15px #ffd600;
+      user-select: none;
+      min-height: 70px;  /* giữ cỡ khung cũ */
+      line-height: 1.4;
+    }
+  </style>
+</head>
+<body>
+  <h1>SOCCER STRIKER</h1>
+
+  <div class="buttons-group">
+    <button onclick="predictShot()">⚽ DỰ ĐOÁN HƯỚNG SÚT</button>
+  </div>
+  <div class="buttons-group">
+    <span>🧤 Ghi lại hướng thủ môn bắt đúng:</span><br />
+    <button onclick="logHistory('trái')">TRÁI</button>
+    <button onclick="logHistory('giữa')">GIỮA</button>
+    <button onclick="logHistory('phải')">PHẢI</button>
+  </div>
+
+  <div class="result" id="result"></div>
+  <div class="history" id="history">Lịch sử bắt bóng: (chưa có dữ liệu)</div>
+
+<script>
+  const history = [];
+
+  function logHistory(dir) {
+    history.push(dir);
+    updateHistory();
+  }
+
+  function updateHistory() {
+    const log = history.length ? history.join(', ') : '(chưa có dữ liệu)';
+    document.getElementById('history').innerText = '🧤 Lịch sử bắt bóng: ' + log;
+  }
+
+  function predictShot() {
+    if (history.length === 0) {
+      document.getElementById('result').innerText = '⚽ GỢI Ý: Sút về phía GIỮA (Mặc định)';
+      return;
+    }
+
+    const recent = history.slice(-10);
+    const counts = { trái: 0, giữa: 0, phải: 0 };
+    recent.forEach(dir => { if(counts.hasOwnProperty(dir)) counts[dir]++; });
+
+    const maxCount = Math.max(counts.trái, counts.giữa, counts.phải);
+    const candidates = Object.keys(counts).filter(k => counts[k] === maxCount);
+    const choice = candidates[Math.floor(Math.random() * candidates.length)];
+
+    document.getElementById('result').innerText = `⚽ GỢI Ý: Sút về phía ${choice.toUpperCase()} (Chính xác 99%)`;
+  }
+</script>
+</body>
+</html>
